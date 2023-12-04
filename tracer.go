@@ -119,8 +119,7 @@ func (tracer Tracer) InterceptResponse(ctx context.Context, next graphql.Respons
 		}
 
 		// debounced
-		if !sendingQueued.Load() {
-			sendingQueued.Store(true)
+		if sendingQueued.CompareAndSwap(false, true) {
 			go func() {
 				defer sendingQueued.Store(false)
 				time.Sleep(tracer.sendReportTimeout)

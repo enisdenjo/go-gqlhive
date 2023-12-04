@@ -397,3 +397,101 @@
  "size": 1
 }
 ---
+
+[TestSendingQueuedReports - 1]
+{
+ "map": {
+  "{ todos { id } } #1": {
+   "fields": [
+    "Query.todos",
+    "Todo.id"
+   ],
+   "operation": "{ todos { id } } #1"
+  },
+  "{ todos { id } } #2": {
+   "fields": [
+    "Query.todos",
+    "Todo.id"
+   ],
+   "operation": "{ todos { id } } #2"
+  },
+  "{ todos { id } } #3": {
+   "fields": [
+    "Query.todos",
+    "Todo.id"
+   ],
+   "operation": "{ todos { id } } #3"
+  },
+  "{ todos { id } } #4": {
+   "fields": [
+    "Query.todos",
+    "Todo.id"
+   ],
+   "operation": "{ todos { id } } #4"
+  }
+ },
+ "operations": [
+  {
+   "execution": {
+    "duration": -1,
+    "errorsTotal": 0,
+    "ok": true
+   },
+   "metadata": {
+    "client": {
+     "name": "go-gqlhive",
+     "version": "0.0.0"
+    }
+   },
+   "operationMapKey": "{ todos { id } } #1",
+   "timestamp": -1
+  },
+  {
+   "execution": {
+    "duration": -1,
+    "errorsTotal": 0,
+    "ok": true
+   },
+   "metadata": {
+    "client": {
+     "name": "go-gqlhive",
+     "version": "0.0.0"
+    }
+   },
+   "operationMapKey": "{ todos { id } } #2",
+   "timestamp": -1
+  },
+  {
+   "execution": {
+    "duration": -1,
+    "errorsTotal": 0,
+    "ok": true
+   },
+   "metadata": {
+    "client": {
+     "name": "go-gqlhive",
+     "version": "0.0.0"
+    }
+   },
+   "operationMapKey": "{ todos { id } } #3",
+   "timestamp": -1
+  },
+  {
+   "execution": {
+    "duration": -1,
+    "errorsTotal": 0,
+    "ok": true
+   },
+   "metadata": {
+    "client": {
+     "name": "go-gqlhive",
+     "version": "0.0.0"
+    }
+   },
+   "operationMapKey": "{ todos { id } } #4",
+   "timestamp": -1
+  }
+ ],
+ "size": 4
+}
+---

@@ -3,7 +3,9 @@ package gqlhive
 import (
 	"context"
 	"os"
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/99designs/gqlgen/client"
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -125,4 +127,38 @@ func TestCreatedReports(t *testing.T) {
 			snaps.MatchJSON(t, sentReport)
 		})
 	}
+}
+
+func TestSendingQueuedReports(t *testing.T) {
+	server := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	var sentReport *Report
+	server.Use(NewTracer(
+		"<token>",
+		WithGenerateID(func(operation string, operationName nullable.TrimmedString) string {
+			return operation
+		}),
+		WithSendReportTimeout(1*time.Second),
+		WithSendReport(func(ctx context.Context, endpoint, token string, report *Report) error {
+			for _, info := range report.OperationInfos {
+				info.Timestamp = -1
+				info.Execution.Duration = -1
+			}
+			sentReport = report
+			wg.Done() // we also test the amount of SendReport calles here because calling wg.Done too many times will panic
+			return nil
+		}),
+	))
+
+	res := map[string]any{}
+	client.New(server).MustPost("{ todos { id } } #1", &res)
+	client.New(server).MustPost("{ todos { id } } #2", &res)
+	client.New(server).MustPost("{ todos { id } } #3", &res)
+	client.New(server).MustPost("{ todos { id } } #4", &res)
+
+	wg.Wait()
+
+	snaps.MatchJSON(t, sentReport)
 }
