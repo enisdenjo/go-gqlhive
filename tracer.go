@@ -48,11 +48,13 @@ func (tracer Tracer) Validate(schema graphql.ExecutableSchema) error {
 
 // InterceptResponse intercepts the incoming request.
 func (tracer Tracer) InterceptResponse(ctx context.Context, next graphql.ResponseHandler) *graphql.Response {
-	// Some errors can happen outside of an operation so we need to check whether an operation was executed
 	if !graphql.HasOperationContext(ctx) {
 		return next(ctx)
 	}
 	operationCtx := graphql.GetOperationContext(ctx)
+	if operationCtx.Operation == nil {
+		return next(ctx)
+	}
 
 	operationStart := operationCtx.Stats.OperationStart
 	operation := &OperationWithInfo{

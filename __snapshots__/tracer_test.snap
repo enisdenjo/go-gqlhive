@@ -1,0 +1,74 @@
+
+[TestCreatedReports/{_todos_{_id_}_} - 1]
+{
+ "map": {
+  "id": {
+   "fields": [
+    "Query",
+    "Query.todos",
+    "Todo",
+    "Todo.id"
+   ],
+   "operation": "{ todos { id } }"
+  }
+ },
+ "operations": [
+  {
+   "execution": {
+    "duration": -1,
+    "errorsTotal": 0,
+    "ok": true
+   },
+   "metadata": {
+    "client": {
+     "name": "go-gqlhive",
+     "version": "0.0.0"
+    }
+   },
+   "operationMapKey": "id",
+   "timestamp": -1
+  }
+ ],
+ "size": 1
+}
+---
+
+[TestCreatedReports/{____todos_{_____id_____user_{______name______id_____}_____text_____done____}___} - 1]
+{
+ "map": {
+  "id": {
+   "fields": [
+    "Query",
+    "Query.todos",
+    "Todo",
+    "Todo.id",
+    "Todo.user",
+    "User",
+    "User.name",
+    "User.id",
+    "Todo.text",
+    "Todo.done"
+   ],
+   "operation": "{\n\t\t\ttodos {\n\t\t\t\tid\n\t\t\t\tuser {\n\t\t\t\t\tname\n\t\t\t\t\tid\n\t\t\t\t}\n\t\t\t\ttext\n\t\t\t\tdone\n\t\t\t}\n\t\t}"
+  }
+ },
+ "operations": [
+  {
+   "execution": {
+    "duration": -1,
+    "errorsTotal": 0,
+    "ok": true
+   },
+   "metadata": {
+    "client": {
+     "name": "go-gqlhive",
+     "version": "0.0.0"
+    }
+   },
+   "operationMapKey": "id",
+   "timestamp": -1
+  }
+ ],
+ "size": 1
+}
+---
