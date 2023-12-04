@@ -8,7 +8,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/enisdenjo/go-gqlhive"
-	"github.com/enisdenjo/go-gqlhive/fixtures/todos/graph"
+	"github.com/enisdenjo/go-gqlhive/internal/fixtures/todos/graph"
 )
 
 const defaultPort = "8080"

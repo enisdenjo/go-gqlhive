@@ -14,7 +14,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/enisdenjo/go-gqlhive/fixtures/todos/graph/model"
+	"github.com/enisdenjo/go-gqlhive/internal/fixtures/todos/graph/model"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )

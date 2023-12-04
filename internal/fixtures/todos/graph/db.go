@@ -1,6 +1,6 @@
 package graph
 
-import "github.com/enisdenjo/go-gqlhive/fixtures/todos/graph/model"
+import "github.com/enisdenjo/go-gqlhive/internal/fixtures/todos/graph/model"
 
 // In-Memory database for the graph.
 
