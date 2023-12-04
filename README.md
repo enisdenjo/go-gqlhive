@@ -1,4 +1,4 @@
-# gqlhive
+# gqlhive [![Go Report Card](https://goreportcard.com/badge/github.com/enisdenjo/go-gqlhive)](https://goreportcard.com/report/github.com/enisdenjo/go-gqlhive) [![Go Reference](https://pkg.go.dev/badge/github.com/enisdenjo/go-gqlhive.svg)](https://pkg.go.dev/github.com/enisdenjo/go-gqlhive)
 
 Usage reporting to GraphQL Hive for [gqlgen](https://gqlgen.com/).
 
@@ -22,10 +22,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/enisdenjo/go-gqlhive/graphql/handler"
+	"github.com/enisdenjo/go-gqlhive/graphql/playground"
 	"github.com/enisdenjo/go-gqlhive"
-	"github.com/enisdenjo/go-gqlhive/fixtures/todos/graph"
+	"github.com/enisdenjo/go-gqlhive/internal/fixtures/todos/graph"
 )
 
 const defaultPort = "8080"
@@ -65,11 +65,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/enisdenjo/go-gqlhive/graphql/handler"
+	"github.com/enisdenjo/go-gqlhive/graphql/playground"
 	"github.com/domonda/go-types/nullable"
 	"github.com/enisdenjo/go-gqlhive"
-	"github.com/enisdenjo/go-gqlhive/fixtures/todos/graph"
+	"github.com/enisdenjo/go-gqlhive/internal/fixtures/todos/graph"
 )
 
 const defaultPort = "8080"
