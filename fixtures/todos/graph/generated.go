@@ -52,7 +52,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Todos func(childComplexity int) int
+		Todos func(childComplexity int, condition *model.TodosCondition, sortBy *model.TodosSortBy) int
 	}
 
 	Todo struct {
@@ -72,7 +72,7 @@ type MutationResolver interface {
 	CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error)
 }
 type QueryResolver interface {
-	Todos(ctx context.Context) ([]*model.Todo, error)
+	Todos(ctx context.Context, condition *model.TodosCondition, sortBy *model.TodosSortBy) ([]*model.Todo, error)
 }
 
 type executableSchema struct {
@@ -111,7 +111,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.Todos(childComplexity), true
+		args, err := ec.field_Query_todos_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Todos(childComplexity, args["condition"].(*model.TodosCondition), args["sortBy"].(*model.TodosSortBy)), true
 
 	case "Todo.done":
 		if e.complexity.Todo.Done == nil {
@@ -164,6 +169,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputNewTodo,
+		ec.unmarshalInputTodosCondition,
 	)
 	first := true
 
@@ -310,6 +316,30 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_todos_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TodosCondition
+	if tmp, ok := rawArgs["condition"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("condition"))
+		arg0, err = ec.unmarshalOTodosCondition2ᚖgithubᚗcomᚋenisdenjoᚋgoᚑgqlhiveᚋfixturesᚋtodosᚋgraphᚋmodelᚐTodosCondition(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["condition"] = arg0
+	var arg1 *model.TodosSortBy
+	if tmp, ok := rawArgs["sortBy"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortBy"))
+		arg1, err = ec.unmarshalOTodosSortBy2ᚖgithubᚗcomᚋenisdenjoᚋgoᚑgqlhiveᚋfixturesᚋtodosᚋgraphᚋmodelᚐTodosSortBy(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sortBy"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field___Type_enumValues_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -427,7 +457,7 @@ func (ec *executionContext) _Query_todos(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Todos(rctx)
+		return ec.resolvers.Query().Todos(rctx, fc.Args["condition"].(*model.TodosCondition), fc.Args["sortBy"].(*model.TodosSortBy))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -463,6 +493,17 @@ func (ec *executionContext) fieldContext_Query_todos(ctx context.Context, field 
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Todo", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_todos_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -2673,6 +2714,33 @@ func (ec *executionContext) unmarshalInputNewTodo(ctx context.Context, obj inter
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputTodosCondition(ctx context.Context, obj interface{}) (model.TodosCondition, error) {
+	var it model.TodosCondition
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"searchText"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "searchText":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("searchText"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SearchText = data
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -3637,6 +3705,30 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOTodosCondition2ᚖgithubᚗcomᚋenisdenjoᚋgoᚑgqlhiveᚋfixturesᚋtodosᚋgraphᚋmodelᚐTodosCondition(ctx context.Context, v interface{}) (*model.TodosCondition, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputTodosCondition(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOTodosSortBy2ᚖgithubᚗcomᚋenisdenjoᚋgoᚑgqlhiveᚋfixturesᚋtodosᚋgraphᚋmodelᚐTodosSortBy(ctx context.Context, v interface{}) (*model.TodosSortBy, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.TodosSortBy)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTodosSortBy2ᚖgithubᚗcomᚋenisdenjoᚋgoᚑgqlhiveᚋfixturesᚋtodosᚋgraphᚋmodelᚐTodosSortBy(ctx context.Context, sel ast.SelectionSet, v *model.TodosSortBy) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

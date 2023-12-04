@@ -2,6 +2,12 @@
 
 package model
 
+import (
+	"fmt"
+	"io"
+	"strconv"
+)
+
 type NewTodo struct {
 	Text   string `json:"text"`
 	UserID string `json:"userId"`
@@ -14,7 +20,52 @@ type Todo struct {
 	User *User  `json:"user"`
 }
 
+type TodosCondition struct {
+	SearchText *string `json:"searchText,omitempty"`
+}
+
 type User struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
+}
+
+type TodosSortBy string
+
+const (
+	TodosSortByNameAsc  TodosSortBy = "NAME_ASC"
+	TodosSortByNameDesc TodosSortBy = "NAME_DESC"
+)
+
+var AllTodosSortBy = []TodosSortBy{
+	TodosSortByNameAsc,
+	TodosSortByNameDesc,
+}
+
+func (e TodosSortBy) IsValid() bool {
+	switch e {
+	case TodosSortByNameAsc, TodosSortByNameDesc:
+		return true
+	}
+	return false
+}
+
+func (e TodosSortBy) String() string {
+	return string(e)
+}
+
+func (e *TodosSortBy) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = TodosSortBy(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid TodosSortBy", str)
+	}
+	return nil
+}
+
+func (e TodosSortBy) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

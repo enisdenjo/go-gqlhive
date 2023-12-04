@@ -34,7 +34,7 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 }
 
 // Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
+func (r *queryResolver) Todos(ctx context.Context, condition *model.TodosCondition, sortBy *model.TodosSortBy) ([]*model.Todo, error) {
 	return todos, nil
 }
 

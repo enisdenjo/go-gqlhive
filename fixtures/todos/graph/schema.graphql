@@ -11,7 +11,16 @@ type User {
 }
 
 type Query {
-  todos: [Todo!]!
+  todos(condition: TodosCondition, sortBy: TodosSortBy): [Todo!]!
+}
+
+input TodosCondition {
+  searchText: String
+}
+
+enum TodosSortBy {
+  NAME_ASC
+  NAME_DESC
 }
 
 input NewTodo {
