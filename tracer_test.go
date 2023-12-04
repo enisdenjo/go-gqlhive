@@ -10,7 +10,7 @@ import (
 	"github.com/99designs/gqlgen/client"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/domonda/go-types/nullable"
-	"github.com/enisdenjo/go-gqlhive/fixtures/todos/graph"
+	"github.com/enisdenjo/go-gqlhive/internal/fixtures/todos/graph"
 	"github.com/gkampitakis/go-snaps/snaps"
 )
 
