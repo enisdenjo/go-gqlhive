@@ -46,7 +46,7 @@ type Execution struct {
 	Ok bool `json:"ok"`
 	// Duration of the entire operation in nanoseconds
 	Duration int64 `json:"duration"`
-	// Total number of occured GraphQL errors
+	// Total number of occurred GraphQL errors
 	ErrorsTotal int `json:"errorsTotal"`
 }
 
