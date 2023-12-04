@@ -62,6 +62,11 @@ func TestCreatedReports(t *testing.T) {
 				id
 			}
 		}`,
+		`{
+			todos(condition: { user: { name: "deep" } }) {
+				id
+			}
+		}`,
 	}
 
 	for _, query := range queries {

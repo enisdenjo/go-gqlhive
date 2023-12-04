@@ -18,6 +18,11 @@ input TodosCondition {
   searchText: String
   statuses: [TodosConditionStatus!]
   userStatus: TodosConditionUserStatus
+  user: TodosConditionUser
+}
+
+input TodosConditionUser {
+  name: String
 }
 
 enum TodosConditionStatus {
