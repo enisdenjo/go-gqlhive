@@ -2,54 +2,114 @@ package gqlhive
 
 import (
 	"context"
+	"time"
 
-	"github.com/99designs/gqlgen/graphql"
+	"github.com/domonda/go-types/nullable"
+	"github.com/domonda/go-types/uu"
 )
 
-type Tracer struct {
-	OperationName string
+const (
+	CLIENT_NAME    = "go-gqlhive"
+	CLIENT_VERSION = "0.0.0"
+)
+
+type Report struct {
+	// Number of operations being reported
+	Size uint `json:"size"`
+	// The executed operations
+	Operations map[uu.ID]Operation `json:"map"`
+	// Info about each operation's execution
+	OperationInfos []*OperationInfo `json:"operations"`
 }
 
-var _ interface {
-	graphql.HandlerExtension
-	graphql.OperationInterceptor
-	graphql.ResponseInterceptor
-	graphql.FieldInterceptor
-} = Tracer{}
-
-func NewTracer() Tracer {
-	return Tracer{}
+type Operation struct {
+	// Operation's body
+	// e.g. "query me { me { id name } }"
+	Operation string `json:"operation"`
+	// Name of the operation
+	// e.g. "me"
+	OperationName nullable.TrimmedString `json:"operationName,omitempty"`
+	// Schema coordinates
+	// e.g. ["Query", "Query.me", "User", "User.id", "User.name"]
+	Fields []string `json:"fields"`
 }
 
-func (a Tracer) ExtensionName() string {
-	return "GraphQLHive"
+type OperationInfo struct {
+	// The ID of the operation in the operations map
+	ID uu.ID `json:"operationMapKey"`
+	// UNIX time in miliseconds of the operation's execution start
+	Timestamp int64     `json:"timestamp"`
+	Execution Execution `json:"execution"`
+	Metadata  Metadata  `json:"metadata"`
 }
 
-func (a Tracer) Validate(schema graphql.ExecutableSchema) error {
-	// nothing to validate
-	return nil
+type Execution struct {
+	// Was the execution successful?
+	Ok bool `json:"ok"`
+	// Duration of the entire operation in nanoseconds
+	Duration int64 `json:"duration"`
+	// Total number of occured GraphQL errors
+	ErrorsTotal int `json:"errorsTotal"`
 }
 
-func (a Tracer) InterceptOperation(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
-	// oc := graphql.GetOperationContext(ctx)
-
-	return next(ctx)
+type Metadata struct {
+	Client Client `json:"client"`
 }
 
-func (a Tracer) InterceptField(ctx context.Context, next graphql.Resolver) (interface{}, error) {
-	// fc := graphql.GetFieldContext(ctx)
-
-	return next(ctx)
+type Client struct {
+	Name    string `json:"name"`
+	Version string `json:"version"`
 }
 
-// InterceptResponse intercepts the incoming request.
-func (a Tracer) InterceptResponse(ctx context.Context, next graphql.ResponseHandler) *graphql.Response {
-	// Some errors can happen outside of an operation so we need to check whether an operation was executed
-	if !graphql.HasOperationContext(ctx) {
-		return next(ctx)
+type OperationWithInfo struct {
+	Operation
+	OperationInfo
+}
+
+func NewOperationWithInfo(operation string, operationName nullable.TrimmedString, operationStart time.Time, fields []string) *OperationWithInfo {
+	return &OperationWithInfo{
+		Operation: Operation{
+			Operation:     operation,
+			OperationName: operationName,
+			Fields:        fields,
+		},
+		OperationInfo: OperationInfo{
+			ID:        uu.IDv4(),
+			Timestamp: operationStart.UnixMilli(),
+			Execution: Execution{},
+			Metadata: Metadata{
+				Client: Client{
+					Name:    CLIENT_NAME,
+					Version: CLIENT_VERSION,
+				},
+			},
+		},
 	}
+}
 
-	// oc := graphql.GetOperationContext(ctx)
+var operationCtxKey int
 
-	return next(ctx)
+func ContextWithOperation(ctx context.Context, operation *OperationWithInfo) context.Context {
+	return context.WithValue(ctx, &operationCtxKey, operation)
+}
+
+func OperationFromContext(ctx context.Context) (operation *OperationWithInfo, exists bool) {
+	operationVal := ctx.Value(&operationCtxKey)
+	if operationVal == nil {
+		return nil, false
+	}
+	return operationVal.(*OperationWithInfo), true
+}
+
+var pendingReport *Report
+
+func NewOrPendingReport() *Report {
+	if pendingReport == nil {
+		pendingReport = &Report{}
+	}
+	return pendingReport
+}
+
+func FlushReport() {
+	pendingReport = nil
 }
