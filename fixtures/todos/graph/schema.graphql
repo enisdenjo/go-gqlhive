@@ -16,6 +16,18 @@ type Query {
 
 input TodosCondition {
   searchText: String
+  statuses: [TodosConditionStatus!]
+  userStatus: TodosConditionUserStatus
+}
+
+enum TodosConditionStatus {
+  DONE
+  ASSIGNED
+}
+
+enum TodosConditionUserStatus {
+  AVAILABLE
+  UNAVAILABLE
 }
 
 enum TodosSortBy {

@@ -119,9 +119,9 @@ func (tracer Tracer) InterceptField(ctx context.Context, next graphql.Resolver) 
 }
 
 func createFieldsForOperation(rootSelectionSet ast.SelectionSet) (fields []string) {
-	var visit func(selSet ast.SelectionSet)
-	var visitArgumentsChildren func(parentDefName string, childList ast.ChildValueList)
-	visit = func(selSet ast.SelectionSet) {
+	var visitField func(selSet ast.SelectionSet)
+	var visitValue func(value *ast.Value)
+	visitField = func(selSet ast.SelectionSet) {
 		first := true
 		for _, sel := range selSet {
 			field := sel.(*ast.Field)
@@ -137,19 +137,35 @@ func createFieldsForOperation(rootSelectionSet ast.SelectionSet) (fields []strin
 					fmt.Sprintf("%s.%s.%s", field.ObjectDefinition.Name, field.Name, arg.Name),
 					arg.Value.Definition.Name,
 				)
-				visitArgumentsChildren(arg.Value.Definition.Name, arg.Value.Children)
+				visitValue(arg.Value)
 			}
-			visit(field.SelectionSet)
+			visitField(field.SelectionSet)
 		}
 	}
-	visitArgumentsChildren = func(parentDefName string, childList ast.ChildValueList) {
-		for _, child := range childList {
+	visitValue = func(value *ast.Value) {
+		if len(value.Children) == 0 && value.Definition.Kind == ast.Enum {
+			// single enum
 			fields = append(fields,
-				fmt.Sprintf("%s.%s", parentDefName, child.Name),
+				fmt.Sprintf("%s.%s", value.Definition.Name, value.Raw),
 			)
-			visitArgumentsChildren(child.Value.Definition.Name, child.Value.Children)
+			return
+		}
+
+		for _, child := range value.Children {
+			if value.Definition.Kind == ast.Enum {
+				// list of enums
+				fields = append(fields,
+					fmt.Sprintf("%s.%s", value.Definition.Name, child.Value.Raw),
+				)
+				continue
+			}
+
+			fields = append(fields,
+				fmt.Sprintf("%s.%s", value.Definition.Name, child.Name),
+			)
+			visitValue(child.Value)
 		}
 	}
-	visit(rootSelectionSet)
+	visitField(rootSelectionSet)
 	return fields
 }

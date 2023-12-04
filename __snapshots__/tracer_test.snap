@@ -153,3 +153,120 @@
  "size": 1
 }
 ---
+
+[TestCreatedReports/{____todos(sortBy:_NAME_DESC,_condition:_{_searchText:_"test"_})_{_____id____}___} - 1]
+{
+ "map": {
+  "id": {
+   "fields": [
+    "Query",
+    "Query.todos",
+    "Query.todos.sortBy",
+    "TodosSortBy",
+    "TodosSortBy.NAME_DESC",
+    "Query.todos.condition",
+    "TodosCondition",
+    "TodosCondition.searchText",
+    "Todo",
+    "Todo.id"
+   ],
+   "operation": "{\n\t\t\ttodos(sortBy: NAME_DESC, condition: { searchText: \"test\" }) {\n\t\t\t\tid\n\t\t\t}\n\t\t}"
+  }
+ },
+ "operations": [
+  {
+   "execution": {
+    "duration": -1,
+    "errorsTotal": 0,
+    "ok": true
+   },
+   "metadata": {
+    "client": {
+     "name": "go-gqlhive",
+     "version": "0.0.0"
+    }
+   },
+   "operationMapKey": "id",
+   "timestamp": -1
+  }
+ ],
+ "size": 1
+}
+---
+
+[TestCreatedReports/{____todos(condition:_{_statuses:_[DONE,_ASSIGNED]_})_{_____id____}___} - 1]
+{
+ "map": {
+  "id": {
+   "fields": [
+    "Query",
+    "Query.todos",
+    "Query.todos.condition",
+    "TodosCondition",
+    "TodosCondition.statuses",
+    "TodosConditionStatus.DONE",
+    "TodosConditionStatus.ASSIGNED",
+    "Todo",
+    "Todo.id"
+   ],
+   "operation": "{\n\t\t\ttodos(condition: { statuses: [DONE, ASSIGNED] }) {\n\t\t\t\tid\n\t\t\t}\n\t\t}"
+  }
+ },
+ "operations": [
+  {
+   "execution": {
+    "duration": -1,
+    "errorsTotal": 0,
+    "ok": true
+   },
+   "metadata": {
+    "client": {
+     "name": "go-gqlhive",
+     "version": "0.0.0"
+    }
+   },
+   "operationMapKey": "id",
+   "timestamp": -1
+  }
+ ],
+ "size": 1
+}
+---
+
+[TestCreatedReports/{____todos(condition:_{_userStatus:_AVAILABLE_})_{_____id____}___} - 1]
+{
+ "map": {
+  "id": {
+   "fields": [
+    "Query",
+    "Query.todos",
+    "Query.todos.condition",
+    "TodosCondition",
+    "TodosCondition.userStatus",
+    "TodosConditionUserStatus.AVAILABLE",
+    "Todo",
+    "Todo.id"
+   ],
+   "operation": "{\n\t\t\ttodos(condition: { userStatus: AVAILABLE }) {\n\t\t\t\tid\n\t\t\t}\n\t\t}"
+  }
+ },
+ "operations": [
+  {
+   "execution": {
+    "duration": -1,
+    "errorsTotal": 0,
+    "ok": true
+   },
+   "metadata": {
+    "client": {
+     "name": "go-gqlhive",
+     "version": "0.0.0"
+    }
+   },
+   "operationMapKey": "id",
+   "timestamp": -1
+  }
+ ],
+ "size": 1
+}
+---

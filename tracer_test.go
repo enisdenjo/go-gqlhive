@@ -47,6 +47,21 @@ func TestCreatedReports(t *testing.T) {
 				id
 			}
 		}`,
+		`{
+			todos(sortBy: NAME_DESC, condition: { searchText: "test" }) {
+				id
+			}
+		}`,
+		`{
+			todos(condition: { statuses: [DONE, ASSIGNED] }) {
+				id
+			}
+		}`,
+		`{
+			todos(condition: { userStatus: AVAILABLE }) {
+				id
+			}
+		}`,
 	}
 
 	for _, query := range queries {
