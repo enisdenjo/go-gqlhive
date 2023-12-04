@@ -92,6 +92,8 @@ func (tracer Tracer) InterceptResponse(ctx context.Context, next graphql.Respons
 			panic(err)
 		}
 
+		// TODO: implement send retry
+
 		doSend := func() error {
 			queuedReportMtx.Lock()
 			defer queuedReportMtx.Unlock()

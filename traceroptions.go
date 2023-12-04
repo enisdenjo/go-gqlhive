@@ -1,7 +1,11 @@
 package gqlhive
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/domonda/go-types/nullable"
@@ -37,7 +41,28 @@ func WithSendReportTimeout(timeout time.Duration) TracerOption {
 }
 
 func defaultSendReport(ctx context.Context, endpoint, token string, report *Report) error {
-	panic("TODO")
+	var buf bytes.Buffer
+	err := json.NewEncoder(&buf).Encode(report)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "PORT", endpoint, &buf)
+	if err != nil {
+		return err
+	}
+	req.Header.Add("Content-Type", "application/json")
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return fmt.Errorf("report sending failed with %d %s", res.StatusCode, res.Status)
+	}
+
+	return nil
 }
 
 type SendReport func(ctx context.Context, endpoint, token string, report *Report) error
