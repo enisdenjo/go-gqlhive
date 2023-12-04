@@ -124,22 +124,36 @@ func createFieldsForOperation(rootSelectionSet ast.SelectionSet) (fields []strin
 	visitField = func(selSet ast.SelectionSet) {
 		first := true
 		for _, sel := range selSet {
-			field := sel.(*ast.Field)
-			if first {
-				fields = append(fields, field.ObjectDefinition.Name)
-				first = false
+			switch sel := sel.(type) {
+			case *ast.Field:
+				{
+					if first {
+						fields = append(fields, sel.ObjectDefinition.Name)
+						first = false
+					}
+					fields = append(fields,
+						fmt.Sprintf("%s.%s", sel.ObjectDefinition.Name, sel.Name),
+					)
+					for _, arg := range sel.Arguments {
+						fields = append(fields,
+							fmt.Sprintf("%s.%s.%s", sel.ObjectDefinition.Name, sel.Name, arg.Name),
+							arg.Value.Definition.Name,
+						)
+						visitValue(arg.Value)
+					}
+					visitField(sel.SelectionSet)
+				}
+			case *ast.FragmentSpread:
+				{
+					// skip directly to the fields of the fragment
+					visitField(sel.Definition.SelectionSet)
+				}
+			case *ast.InlineFragment:
+				{
+					// skip directly to the fields of the inline fragment
+					visitField(sel.SelectionSet)
+				}
 			}
-			fields = append(fields,
-				fmt.Sprintf("%s.%s", field.ObjectDefinition.Name, field.Name),
-			)
-			for _, arg := range field.Arguments {
-				fields = append(fields,
-					fmt.Sprintf("%s.%s.%s", field.ObjectDefinition.Name, field.Name, arg.Name),
-					arg.Value.Definition.Name,
-				)
-				visitValue(arg.Value)
-			}
-			visitField(field.SelectionSet)
 		}
 	}
 	visitValue = func(value *ast.Value) {

@@ -21,12 +21,102 @@ type Todo struct {
 }
 
 type TodosCondition struct {
-	SearchText *string `json:"searchText,omitempty"`
+	SearchText *string                   `json:"searchText,omitempty"`
+	Statuses   []TodosConditionStatus    `json:"statuses,omitempty"`
+	UserStatus *TodosConditionUserStatus `json:"userStatus,omitempty"`
+	User       *TodosConditionUser       `json:"user,omitempty"`
+}
+
+type TodosConditionUser struct {
+	Name *string `json:"name,omitempty"`
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID    string  `json:"id"`
+	Name  string  `json:"name"`
+	Todos []*Todo `json:"todos"`
+}
+
+type TodosConditionStatus string
+
+const (
+	TodosConditionStatusDone     TodosConditionStatus = "DONE"
+	TodosConditionStatusAssigned TodosConditionStatus = "ASSIGNED"
+)
+
+var AllTodosConditionStatus = []TodosConditionStatus{
+	TodosConditionStatusDone,
+	TodosConditionStatusAssigned,
+}
+
+func (e TodosConditionStatus) IsValid() bool {
+	switch e {
+	case TodosConditionStatusDone, TodosConditionStatusAssigned:
+		return true
+	}
+	return false
+}
+
+func (e TodosConditionStatus) String() string {
+	return string(e)
+}
+
+func (e *TodosConditionStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = TodosConditionStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid TodosConditionStatus", str)
+	}
+	return nil
+}
+
+func (e TodosConditionStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type TodosConditionUserStatus string
+
+const (
+	TodosConditionUserStatusAvailable   TodosConditionUserStatus = "AVAILABLE"
+	TodosConditionUserStatusUnavailable TodosConditionUserStatus = "UNAVAILABLE"
+)
+
+var AllTodosConditionUserStatus = []TodosConditionUserStatus{
+	TodosConditionUserStatusAvailable,
+	TodosConditionUserStatusUnavailable,
+}
+
+func (e TodosConditionUserStatus) IsValid() bool {
+	switch e {
+	case TodosConditionUserStatusAvailable, TodosConditionUserStatusUnavailable:
+		return true
+	}
+	return false
+}
+
+func (e TodosConditionUserStatus) String() string {
+	return string(e)
+}
+
+func (e *TodosConditionUserStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = TodosConditionUserStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid TodosConditionUserStatus", str)
+	}
+	return nil
+}
+
+func (e TodosConditionUserStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
 type TodosSortBy string

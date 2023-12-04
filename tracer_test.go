@@ -67,6 +67,23 @@ func TestCreatedReports(t *testing.T) {
 				id
 			}
 		}`,
+		`{
+			todos {
+				...TodoFragment
+			}
+		}
+		fragment TodoFragment on Todo {
+			id
+			text
+			user {
+				... on User {
+					id
+					name
+				}
+			}
+			done
+		}
+		`,
 	}
 
 	for _, query := range queries {

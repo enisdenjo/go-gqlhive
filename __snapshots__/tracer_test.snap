@@ -308,3 +308,75 @@
  "size": 1
 }
 ---
+
+[TestCreatedReports/{____todos_{_____...TodoFragment____}___}___fragment_TodoFragment_on_Todo_{____id____text____user_{_____id____}____done___}___ - 1]
+{
+ "map": {
+  "id": {
+   "fields": [
+    "Query",
+    "Query.todos"
+   ],
+   "operation": "{\n\t\t\ttodos {\n\t\t\t\t...TodoFragment\n\t\t\t}\n\t\t}\n\t\tfragment TodoFragment on Todo {\n\t\t\tid\n\t\t\ttext\n\t\t\tuser {\n\t\t\t\tid\n\t\t\t}\n\t\t\tdone\n\t\t}\n\t\t"
+  }
+ },
+ "operations": [
+  {
+   "execution": {
+    "duration": -1,
+    "errorsTotal": 0,
+    "ok": true
+   },
+   "metadata": {
+    "client": {
+     "name": "go-gqlhive",
+     "version": "0.0.0"
+    }
+   },
+   "operationMapKey": "id",
+   "timestamp": -1
+  }
+ ],
+ "size": 1
+}
+---
+
+[TestCreatedReports/{____todos_{_____...TodoFragment____}___}___fragment_TodoFragment_on_Todo_{____id____text____user_{_____..._on_User_{______id______name_____}____}____done___}___ - 1]
+{
+ "map": {
+  "id": {
+   "fields": [
+    "Query",
+    "Query.todos",
+    "Todo",
+    "Todo.id",
+    "Todo.text",
+    "Todo.user",
+    "User",
+    "User.id",
+    "User.name",
+    "Todo.done"
+   ],
+   "operation": "{\n\t\t\ttodos {\n\t\t\t\t...TodoFragment\n\t\t\t}\n\t\t}\n\t\tfragment TodoFragment on Todo {\n\t\t\tid\n\t\t\ttext\n\t\t\tuser {\n\t\t\t\t... on User {\n\t\t\t\t\tid\n\t\t\t\t\tname\n\t\t\t\t}\n\t\t\t}\n\t\t\tdone\n\t\t}\n\t\t"
+  }
+ },
+ "operations": [
+  {
+   "execution": {
+    "duration": -1,
+    "errorsTotal": 0,
+    "ok": true
+   },
+   "metadata": {
+    "client": {
+     "name": "go-gqlhive",
+     "version": "0.0.0"
+    }
+   },
+   "operationMapKey": "id",
+   "timestamp": -1
+  }
+ ],
+ "size": 1
+}
+---
