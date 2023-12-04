@@ -2,10 +2,9 @@ package gqlhive
 
 import (
 	"context"
-	"time"
+	"fmt"
 
 	"github.com/domonda/go-types/nullable"
-	"github.com/domonda/go-types/uu"
 )
 
 const (
@@ -17,7 +16,7 @@ type Report struct {
 	// Number of operations being reported
 	Size uint `json:"size"`
 	// The executed operations
-	Operations map[uu.ID]Operation `json:"map"`
+	Operations map[string]*Operation `json:"map"`
 	// Info about each operation's execution
 	OperationInfos []*OperationInfo `json:"operations"`
 }
@@ -36,7 +35,7 @@ type Operation struct {
 
 type OperationInfo struct {
 	// The ID of the operation in the operations map
-	ID uu.ID `json:"operationMapKey"`
+	ID string `json:"operationMapKey"`
 	// UNIX time in miliseconds of the operation's execution start
 	Timestamp int64     `json:"timestamp"`
 	Execution Execution `json:"execution"`
@@ -66,27 +65,6 @@ type OperationWithInfo struct {
 	OperationInfo
 }
 
-func NewOperationWithInfo(operation string, operationName nullable.TrimmedString, operationStart time.Time, fields []string) *OperationWithInfo {
-	return &OperationWithInfo{
-		Operation: Operation{
-			Operation:     operation,
-			OperationName: operationName,
-			Fields:        fields,
-		},
-		OperationInfo: OperationInfo{
-			ID:        uu.IDv4(),
-			Timestamp: operationStart.UnixMilli(),
-			Execution: Execution{},
-			Metadata: Metadata{
-				Client: Client{
-					Name:    CLIENT_NAME,
-					Version: CLIENT_VERSION,
-				},
-			},
-		},
-	}
-}
-
 var operationCtxKey int
 
 func ContextWithOperation(ctx context.Context, operation *OperationWithInfo) context.Context {
@@ -101,15 +79,20 @@ func OperationFromContext(ctx context.Context) (operation *OperationWithInfo, ex
 	return operationVal.(*OperationWithInfo), true
 }
 
-var pendingReport *Report
-
-func NewOrPendingReport() *Report {
-	if pendingReport == nil {
-		pendingReport = &Report{}
+func AddOperationToReport(report *Report, operation *OperationWithInfo) error {
+	if report.Operations == nil {
+		report.Operations = map[string]*Operation{}
 	}
-	return pendingReport
-}
 
-func FlushReport() {
-	pendingReport = nil
+	_, exists := report.Operations[operation.ID]
+	if exists {
+		return fmt.Errorf("operation with id %q already exists in report", operation.ID)
+	}
+
+	report.Size++
+	report.Operations[operation.ID] = &operation.Operation
+	report.OperationInfos = append(report.OperationInfos, &operation.OperationInfo)
+
+	return nil
+
 }

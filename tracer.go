@@ -11,7 +11,12 @@ import (
 	"github.com/vektah/gqlparser/v2/ast"
 )
 
-type Tracer struct{}
+type Tracer struct {
+	token      string
+	endpoint   string
+	generateID GenerateID
+	sendReport SendReport
+}
 
 var _ interface {
 	graphql.HandlerExtension
@@ -19,21 +24,30 @@ var _ interface {
 	graphql.FieldInterceptor
 } = Tracer{}
 
-func NewTracer() Tracer {
-	return Tracer{}
+func NewTracer(token string, opts ...TracerOption) *Tracer {
+	tracer := &Tracer{
+		token:      token,
+		endpoint:   defaultEndpoint,
+		generateID: defaultGenerateID,
+		sendReport: defaultSendReport,
+	}
+	for _, opt := range opts {
+		opt.set(tracer)
+	}
+	return tracer
 }
 
-func (a Tracer) ExtensionName() string {
+func (tracer Tracer) ExtensionName() string {
 	return "GraphQLHive"
 }
 
-func (a Tracer) Validate(schema graphql.ExecutableSchema) error {
+func (tracer Tracer) Validate(schema graphql.ExecutableSchema) error {
 	// nothing to validate
 	return nil
 }
 
 // InterceptResponse intercepts the incoming request.
-func (a Tracer) InterceptResponse(ctx context.Context, next graphql.ResponseHandler) *graphql.Response {
+func (tracer Tracer) InterceptResponse(ctx context.Context, next graphql.ResponseHandler) *graphql.Response {
 	// Some errors can happen outside of an operation so we need to check whether an operation was executed
 	if !graphql.HasOperationContext(ctx) {
 		return next(ctx)
@@ -41,21 +55,45 @@ func (a Tracer) InterceptResponse(ctx context.Context, next graphql.ResponseHand
 	operationCtx := graphql.GetOperationContext(ctx)
 
 	operationStart := operationCtx.Stats.OperationStart
-	operation := NewOperationWithInfo(operationCtx.RawQuery, nullable.TrimmedStringFrom(operationCtx.OperationName), operationStart, createFieldsForOperation(operationCtx.Operation.SelectionSet))
+	operation := &OperationWithInfo{
+		Operation: Operation{
+			Operation:     operationCtx.RawQuery,
+			OperationName: nullable.TrimmedStringFrom(operationCtx.OperationName),
+			Fields:        createFieldsForOperation(operationCtx.Operation.SelectionSet),
+		},
+		OperationInfo: OperationInfo{
+			ID:        tracer.generateID(operationCtx.RawQuery, nullable.TrimmedStringFrom(operationCtx.OperationName)),
+			Timestamp: operationStart.UnixMilli(),
+			Execution: Execution{
+				// we assume there are no errors, error checks will happen while intercepting fields
+				Ok:          true,
+				ErrorsTotal: 0,
+			},
+			Metadata: Metadata{
+				Client: Client{
+					Name:    CLIENT_NAME,
+					Version: CLIENT_VERSION,
+				},
+			},
+		},
+	}
 	defer func() {
 		operation.Execution.Duration = time.Since(operationStart).Nanoseconds()
 
-		// TODO: queue operation for reporting
-	}()
+		report := &Report{}
+		err := AddOperationToReport(report, operation)
+		if err != nil {
+			// TODO: report gracefully
+			panic(err)
+		}
 
-	// we assume there are no errors, error checks will happen while intercepting fields
-	operation.Execution.Ok = true
-	operation.Execution.ErrorsTotal = 0
+		tracer.sendReport(ctx, tracer.endpoint, tracer.token, report)
+	}()
 
 	return next(ContextWithOperation(ctx, operation))
 }
 
-func (a Tracer) InterceptField(ctx context.Context, next graphql.Resolver) (interface{}, error) {
+func (tracer Tracer) InterceptField(ctx context.Context, next graphql.Resolver) (interface{}, error) {
 	fieldCtx := graphql.GetFieldContext(ctx)
 
 	operation, exists := OperationFromContext(ctx)
