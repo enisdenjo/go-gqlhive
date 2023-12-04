@@ -43,7 +43,7 @@ enum TodosSortBy {
 
 input NewTodo {
   text: String!
-  userId: String!
+  userId: ID!
 }
 
 type Mutation {

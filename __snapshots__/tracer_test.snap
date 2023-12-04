@@ -76,7 +76,9 @@
     "Mutation.createTodo",
     "Mutation.createTodo.input",
     "NewTodo.text",
+    "String",
     "NewTodo.userId",
+    "ID",
     "Todo.id",
     "Todo.text",
     "Todo.user",
@@ -115,7 +117,9 @@
     "Mutation.createTodo",
     "Mutation.createTodo.input",
     "NewTodo.userId",
+    "ID",
     "NewTodo.text",
+    "String",
     "Todo.id"
    ],
    "operation": "mutation CreateTodo {\n\t\t\tcreateTodo(input: { userId: \"u0\", text: \"Check Mail\" }) {\n\t\t\t\tid\n\t\t\t}\n\t\t}"
@@ -152,6 +156,7 @@
     "TodosSortBy.NAME_DESC",
     "Query.todos.condition",
     "TodosCondition.searchText",
+    "String",
     "Todo.id"
    ],
    "operation": "{\n\t\t\ttodos(sortBy: NAME_DESC, condition: { searchText: \"test\" }) {\n\t\t\t\tid\n\t\t\t}\n\t\t}"
@@ -258,6 +263,7 @@
     "Query.todos.condition",
     "TodosCondition.user",
     "TodosConditionUser.name",
+    "String",
     "Todo.id"
    ],
    "operation": "{\n\t\t\ttodos(condition: { user: { name: \"deep\" } }) {\n\t\t\t\tid\n\t\t\t}\n\t\t}"
@@ -298,6 +304,41 @@
     "Todo.done"
    ],
    "operation": "{\n\t\t\ttodos {\n\t\t\t\t...TodoFragment\n\t\t\t}\n\t\t}\n\t\tfragment TodoFragment on Todo {\n\t\t\tid\n\t\t\ttext\n\t\t\tuser {\n\t\t\t\t... on User {\n\t\t\t\t\tid\n\t\t\t\t\tname\n\t\t\t\t}\n\t\t\t}\n\t\t\tdone\n\t\t}\n\t\t"
+  }
+ },
+ "operations": [
+  {
+   "execution": {
+    "duration": -1,
+    "errorsTotal": 0,
+    "ok": true
+   },
+   "metadata": {
+    "client": {
+     "name": "go-gqlhive",
+     "version": "0.0.0"
+    }
+   },
+   "operationMapKey": "id",
+   "timestamp": -1
+  }
+ ],
+ "size": 1
+}
+---
+
+[TestCreatedReports/query_Todos($searchText:_String)_{____todos(condition:_{_searchText:_$searchText_})_{_____id____}___} - 1]
+{
+ "map": {
+  "id": {
+   "fields": [
+    "Query.todos",
+    "Query.todos.condition",
+    "TodosCondition.searchText",
+    "String",
+    "Todo.id"
+   ],
+   "operation": "query Todos($searchText: String) {\n\t\t\ttodos(condition: { searchText: $searchText }) {\n\t\t\t\tid\n\t\t\t}\n\t\t}"
   }
  },
  "operations": [

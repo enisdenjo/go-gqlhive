@@ -2768,7 +2768,7 @@ func (ec *executionContext) unmarshalInputNewTodo(ctx context.Context, obj inter
 			it.Text = data
 		case "userId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}

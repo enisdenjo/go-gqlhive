@@ -149,11 +149,19 @@ func createFieldsForOperation(rootSelectionSet ast.SelectionSet) (fields []strin
 		}
 	}
 	visitValue = func(value *ast.Value) {
-		if len(value.Children) == 0 && value.Definition.Kind == ast.Enum {
-			// single enum
-			fields = append(fields,
-				fmt.Sprintf("%s.%s", value.Definition.Name, value.Raw),
-			)
+		if len(value.Children) == 0 {
+			if value.Definition.Kind == ast.Enum {
+
+				// single enum
+				fields = append(fields,
+					fmt.Sprintf("%s.%s", value.Definition.Name, value.Raw),
+				)
+			} else {
+				// single scalar
+				fields = append(fields,
+					value.Definition.Name,
+				)
+			}
 			return
 		}
 

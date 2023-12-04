@@ -84,6 +84,11 @@ func TestCreatedReports(t *testing.T) {
 			done
 		}
 		`,
+		`query Todos($searchText: String) {
+			todos(condition: { searchText: $searchText }) {
+				id
+			}
+		}`,
 	}
 
 	for _, query := range queries {
