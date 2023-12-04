@@ -4,9 +4,7 @@
  "map": {
   "id": {
    "fields": [
-    "Query",
     "Query.todos",
-    "Todo",
     "Todo.id"
    ],
    "operation": "{ todos { id } }"
@@ -38,12 +36,9 @@
  "map": {
   "id": {
    "fields": [
-    "Query",
     "Query.todos",
-    "Todo",
     "Todo.id",
     "Todo.user",
-    "User",
     "User.name",
     "User.id",
     "Todo.text",
@@ -78,17 +73,13 @@
  "map": {
   "id": {
    "fields": [
-    "Mutation",
     "Mutation.createTodo",
     "Mutation.createTodo.input",
-    "NewTodo",
     "NewTodo.text",
     "NewTodo.userId",
-    "Todo",
     "Todo.id",
     "Todo.text",
     "Todo.user",
-    "User",
     "User.name",
     "Todo.done"
    ],
@@ -121,13 +112,10 @@
  "map": {
   "id": {
    "fields": [
-    "Mutation",
     "Mutation.createTodo",
     "Mutation.createTodo.input",
-    "NewTodo",
     "NewTodo.userId",
     "NewTodo.text",
-    "Todo",
     "Todo.id"
    ],
    "operation": "mutation CreateTodo {\n\t\t\tcreateTodo(input: { userId: \"u0\", text: \"Check Mail\" }) {\n\t\t\t\tid\n\t\t\t}\n\t\t}"
@@ -159,15 +147,11 @@
  "map": {
   "id": {
    "fields": [
-    "Query",
     "Query.todos",
     "Query.todos.sortBy",
-    "TodosSortBy",
     "TodosSortBy.NAME_DESC",
     "Query.todos.condition",
-    "TodosCondition",
     "TodosCondition.searchText",
-    "Todo",
     "Todo.id"
    ],
    "operation": "{\n\t\t\ttodos(sortBy: NAME_DESC, condition: { searchText: \"test\" }) {\n\t\t\t\tid\n\t\t\t}\n\t\t}"
@@ -199,14 +183,11 @@
  "map": {
   "id": {
    "fields": [
-    "Query",
     "Query.todos",
     "Query.todos.condition",
-    "TodosCondition",
     "TodosCondition.statuses",
     "TodosConditionStatus.DONE",
     "TodosConditionStatus.ASSIGNED",
-    "Todo",
     "Todo.id"
    ],
    "operation": "{\n\t\t\ttodos(condition: { statuses: [DONE, ASSIGNED] }) {\n\t\t\t\tid\n\t\t\t}\n\t\t}"
@@ -238,13 +219,10 @@
  "map": {
   "id": {
    "fields": [
-    "Query",
     "Query.todos",
     "Query.todos.condition",
-    "TodosCondition",
     "TodosCondition.userStatus",
     "TodosConditionUserStatus.AVAILABLE",
-    "Todo",
     "Todo.id"
    ],
    "operation": "{\n\t\t\ttodos(condition: { userStatus: AVAILABLE }) {\n\t\t\t\tid\n\t\t\t}\n\t\t}"
@@ -276,48 +254,13 @@
  "map": {
   "id": {
    "fields": [
-    "Query",
     "Query.todos",
     "Query.todos.condition",
-    "TodosCondition",
     "TodosCondition.user",
     "TodosConditionUser.name",
-    "Todo",
     "Todo.id"
    ],
    "operation": "{\n\t\t\ttodos(condition: { user: { name: \"deep\" } }) {\n\t\t\t\tid\n\t\t\t}\n\t\t}"
-  }
- },
- "operations": [
-  {
-   "execution": {
-    "duration": -1,
-    "errorsTotal": 0,
-    "ok": true
-   },
-   "metadata": {
-    "client": {
-     "name": "go-gqlhive",
-     "version": "0.0.0"
-    }
-   },
-   "operationMapKey": "id",
-   "timestamp": -1
-  }
- ],
- "size": 1
-}
----
-
-[TestCreatedReports/{____todos_{_____...TodoFragment____}___}___fragment_TodoFragment_on_Todo_{____id____text____user_{_____id____}____done___}___ - 1]
-{
- "map": {
-  "id": {
-   "fields": [
-    "Query",
-    "Query.todos"
-   ],
-   "operation": "{\n\t\t\ttodos {\n\t\t\t\t...TodoFragment\n\t\t\t}\n\t\t}\n\t\tfragment TodoFragment on Todo {\n\t\t\tid\n\t\t\ttext\n\t\t\tuser {\n\t\t\t\tid\n\t\t\t}\n\t\t\tdone\n\t\t}\n\t\t"
   }
  },
  "operations": [
@@ -346,13 +289,10 @@
  "map": {
   "id": {
    "fields": [
-    "Query",
     "Query.todos",
-    "Todo",
     "Todo.id",
     "Todo.text",
     "Todo.user",
-    "User",
     "User.id",
     "User.name",
     "Todo.done"

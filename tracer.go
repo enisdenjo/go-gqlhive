@@ -122,23 +122,15 @@ func createFieldsForOperation(rootSelectionSet ast.SelectionSet) (fields []strin
 	var visitField func(selSet ast.SelectionSet)
 	var visitValue func(value *ast.Value)
 	visitField = func(selSet ast.SelectionSet) {
-		first := true
 		for _, sel := range selSet {
 			switch sel := sel.(type) {
 			case *ast.Field:
 				{
-					if first {
-						fields = append(fields, sel.ObjectDefinition.Name)
-						first = false
-					}
 					fields = append(fields,
 						fmt.Sprintf("%s.%s", sel.ObjectDefinition.Name, sel.Name),
 					)
 					for _, arg := range sel.Arguments {
-						fields = append(fields,
-							fmt.Sprintf("%s.%s.%s", sel.ObjectDefinition.Name, sel.Name, arg.Name),
-							arg.Value.Definition.Name,
-						)
+						fields = append(fields, fmt.Sprintf("%s.%s.%s", sel.ObjectDefinition.Name, sel.Name, arg.Name))
 						visitValue(arg.Value)
 					}
 					visitField(sel.SelectionSet)
@@ -174,6 +166,7 @@ func createFieldsForOperation(rootSelectionSet ast.SelectionSet) (fields []strin
 				continue
 			}
 
+			// other type of inputs
 			fields = append(fields,
 				fmt.Sprintf("%s.%s", value.Definition.Name, child.Name),
 			)
