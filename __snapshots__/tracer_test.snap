@@ -72,3 +72,84 @@
  "size": 1
 }
 ---
+
+[TestCreatedReports/mutation_CreateTodo_{____createTodo(input:_{_text:_"Check_Mail",_userId:_"u0"_})_{_____id_____text_____user_{______name_____}_____done____}___} - 1]
+{
+ "map": {
+  "id": {
+   "fields": [
+    "Mutation",
+    "Mutation.createTodo",
+    "Mutation.createTodo.input",
+    "NewTodo",
+    "NewTodo.text",
+    "NewTodo.userId",
+    "Todo",
+    "Todo.id",
+    "Todo.text",
+    "Todo.user",
+    "User",
+    "User.name",
+    "Todo.done"
+   ],
+   "operation": "mutation CreateTodo {\n\t\t\tcreateTodo(input: { text: \"Check Mail\", userId: \"u0\" }) {\n\t\t\t\tid\n\t\t\t\ttext\n\t\t\t\tuser {\n\t\t\t\t\tname\n\t\t\t\t}\n\t\t\t\tdone\n\t\t\t}\n\t\t}"
+  }
+ },
+ "operations": [
+  {
+   "execution": {
+    "duration": -1,
+    "errorsTotal": 0,
+    "ok": true
+   },
+   "metadata": {
+    "client": {
+     "name": "go-gqlhive",
+     "version": "0.0.0"
+    }
+   },
+   "operationMapKey": "id",
+   "timestamp": -1
+  }
+ ],
+ "size": 1
+}
+---
+
+[TestCreatedReports/mutation_CreateTodo_{____createTodo(input:_{_userId:_"u0",_text:_"Check_Mail"_})_{_____id____}___} - 1]
+{
+ "map": {
+  "id": {
+   "fields": [
+    "Mutation",
+    "Mutation.createTodo",
+    "Mutation.createTodo.input",
+    "NewTodo",
+    "NewTodo.userId",
+    "NewTodo.text",
+    "Todo",
+    "Todo.id"
+   ],
+   "operation": "mutation CreateTodo {\n\t\t\tcreateTodo(input: { userId: \"u0\", text: \"Check Mail\" }) {\n\t\t\t\tid\n\t\t\t}\n\t\t}"
+  }
+ },
+ "operations": [
+  {
+   "execution": {
+    "duration": -1,
+    "errorsTotal": 0,
+    "ok": true
+   },
+   "metadata": {
+    "client": {
+     "name": "go-gqlhive",
+     "version": "0.0.0"
+    }
+   },
+   "operationMapKey": "id",
+   "timestamp": -1
+  }
+ ],
+ "size": 1
+}
+---

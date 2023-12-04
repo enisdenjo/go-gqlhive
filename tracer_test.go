@@ -32,6 +32,21 @@ func TestCreatedReports(t *testing.T) {
 				done
 			}
 		}`,
+		`mutation CreateTodo {
+			createTodo(input: { text: "Check Mail", userId: "u0" }) {
+				id
+				text
+				user {
+					name
+				}
+				done
+			}
+		}`,
+		`mutation CreateTodo {
+			createTodo(input: { userId: "u0", text: "Check Mail" }) {
+				id
+			}
+		}`,
 	}
 
 	for _, query := range queries {

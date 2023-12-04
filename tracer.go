@@ -120,6 +120,7 @@ func (tracer Tracer) InterceptField(ctx context.Context, next graphql.Resolver) 
 
 func createFieldsForOperation(rootSelectionSet ast.SelectionSet) (fields []string) {
 	var visit func(selSet ast.SelectionSet)
+	var visitArgumentsChildren func(parentDefName string, childList ast.ChildValueList)
 	visit = func(selSet ast.SelectionSet) {
 		first := true
 		for _, sel := range selSet {
@@ -128,8 +129,25 @@ func createFieldsForOperation(rootSelectionSet ast.SelectionSet) (fields []strin
 				fields = append(fields, field.ObjectDefinition.Name)
 				first = false
 			}
-			fields = append(fields, fmt.Sprintf("%s.%s", field.ObjectDefinition.Name, field.Name))
+			fields = append(fields,
+				fmt.Sprintf("%s.%s", field.ObjectDefinition.Name, field.Name),
+			)
+			for _, arg := range field.Arguments {
+				fields = append(fields,
+					fmt.Sprintf("%s.%s.%s", field.ObjectDefinition.Name, field.Name, arg.Name),
+					arg.Value.Definition.Name,
+				)
+				visitArgumentsChildren(arg.Value.Definition.Name, arg.Value.Children)
+			}
 			visit(field.SelectionSet)
+		}
+	}
+	visitArgumentsChildren = func(parentDefName string, childList ast.ChildValueList) {
+		for _, child := range childList {
+			fields = append(fields,
+				fmt.Sprintf("%s.%s", parentDefName, child.Name),
+			)
+			visitArgumentsChildren(child.Value.Definition.Name, child.Value.Children)
 		}
 	}
 	visit(rootSelectionSet)
