@@ -18,6 +18,8 @@ func TestMain(t *testing.M) {
 	os.Exit(v)
 }
 
+// TODO: test errored fields
+
 func TestCreatedReports(t *testing.T) {
 	var queries = []string{
 		"{ todos { id } }",
