@@ -89,6 +89,11 @@ func TestCreatedReports(t *testing.T) {
 				id
 			}
 		}`,
+		`query Todos($userStatus: TodosConditionUserStatus) {
+			todos(condition: { userStatus: $userStatus }) {
+				id
+			}
+		}`,
 	}
 
 	for _, query := range queries {

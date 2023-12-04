@@ -361,3 +361,39 @@
  "size": 1
 }
 ---
+
+[TestCreatedReports/query_Todos($userStatus:_TodosConditionUserStatus)_{____todos(condition:_{_userStatus:_$userStatus_})_{_____id____}___} - 1]
+{
+ "map": {
+  "id": {
+   "fields": [
+    "Query.todos",
+    "Query.todos.condition",
+    "TodosCondition.userStatus",
+    "TodosConditionUserStatus.AVAILABLE",
+    "TodosConditionUserStatus.UNAVAILABLE",
+    "Todo.id"
+   ],
+   "operation": "query Todos($userStatus: TodosConditionUserStatus) {\n\t\t\ttodos(condition: { userStatus: $userStatus }) {\n\t\t\t\tid\n\t\t\t}\n\t\t}"
+  }
+ },
+ "operations": [
+  {
+   "execution": {
+    "duration": -1,
+    "errorsTotal": 0,
+    "ok": true
+   },
+   "metadata": {
+    "client": {
+     "name": "go-gqlhive",
+     "version": "0.0.0"
+    }
+   },
+   "operationMapKey": "id",
+   "timestamp": -1
+  }
+ ],
+ "size": 1
+}
+---
