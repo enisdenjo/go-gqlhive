@@ -106,6 +106,7 @@ func TestCreatedReports(t *testing.T) {
 				WithGenerateID(func(operation string, operationName nullable.TrimmedString) string {
 					return "id"
 				}),
+				WithSendReportTimeout(0),
 				WithSendReport(func(ctx context.Context, endpoint, token string, report *Report) error {
 					for _, info := range report.OperationInfos {
 						info.Timestamp = -1

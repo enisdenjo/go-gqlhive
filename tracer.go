@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -12,10 +14,11 @@ import (
 )
 
 type Tracer struct {
-	token      string
-	endpoint   string
-	generateID GenerateID
-	sendReport SendReport
+	token             string
+	endpoint          string
+	generateID        GenerateID
+	sendReportTimeout time.Duration
+	sendReport        SendReport
 }
 
 var _ interface {
@@ -26,10 +29,11 @@ var _ interface {
 
 func NewTracer(token string, opts ...TracerOption) *Tracer {
 	tracer := &Tracer{
-		token:      token,
-		endpoint:   defaultEndpoint,
-		generateID: defaultGenerateID,
-		sendReport: defaultSendReport,
+		token:             token,
+		endpoint:          defaultEndpoint,
+		generateID:        defaultGenerateID,
+		sendReportTimeout: defaultSendReportTimeout,
+		sendReport:        defaultSendReport,
 	}
 	for _, opt := range opts {
 		opt.set(tracer)
@@ -82,14 +86,50 @@ func (tracer Tracer) InterceptResponse(ctx context.Context, next graphql.Respons
 	defer func() {
 		operation.Execution.Duration = time.Since(operationStart).Nanoseconds()
 
-		report := &Report{}
-		err := AddOperationToReport(report, operation)
+		err := queueOperation(operation)
 		if err != nil {
 			// TODO: report gracefully
 			panic(err)
 		}
 
-		tracer.sendReport(ctx, tracer.endpoint, tracer.token, report)
+		doSend := func() error {
+			queuedReportMtx.Lock()
+			defer queuedReportMtx.Unlock()
+
+			err := tracer.sendReport(ctx, tracer.endpoint, tracer.token, queuedReport)
+			if err != nil {
+				return err
+			}
+
+			// clear queued report
+			queuedReport = nil
+			return nil
+		}
+
+		// synchronous
+		if tracer.sendReportTimeout == 0 {
+			err := doSend()
+			if err != nil {
+				// TODO: report gracefully
+				panic(err)
+			}
+			return
+		}
+
+		// debounced
+		if !sendingQueued.Load() {
+			sendingQueued.Store(true)
+			go func() {
+				defer sendingQueued.Store(false)
+				time.Sleep(tracer.sendReportTimeout)
+
+				err := doSend()
+				if err != nil {
+					// TODO: report gracefully
+					panic(err)
+				}
+			}()
+		}
 	}()
 
 	return next(ContextWithOperation(ctx, operation))
@@ -192,4 +232,32 @@ func createFieldsForOperation(rootSelectionSet ast.SelectionSet) (fields []strin
 	}
 	visitField(rootSelectionSet)
 	return fields
+}
+
+var (
+	queuedReport    *Report
+	queuedReportMtx sync.Mutex
+	sendingQueued   atomic.Bool
+)
+
+func queueOperation(operation *OperationWithInfo) error {
+	queuedReportMtx.Lock()
+	defer queuedReportMtx.Unlock()
+
+	if queuedReport == nil {
+		queuedReport = &Report{
+			Operations: map[string]*Operation{},
+		}
+	}
+
+	_, exists := queuedReport.Operations[operation.ID]
+	if exists {
+		return fmt.Errorf("operation with id %q already exists in report", operation.ID)
+	}
+
+	queuedReport.Size++
+	queuedReport.Operations[operation.ID] = &operation.Operation
+	queuedReport.OperationInfos = append(queuedReport.OperationInfos, &operation.OperationInfo)
+
+	return nil
 }

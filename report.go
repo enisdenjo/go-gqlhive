@@ -2,7 +2,6 @@ package gqlhive
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/domonda/go-types/nullable"
 )
@@ -77,22 +76,4 @@ func OperationFromContext(ctx context.Context) (operation *OperationWithInfo, ex
 		return nil, false
 	}
 	return operationVal.(*OperationWithInfo), true
-}
-
-func AddOperationToReport(report *Report, operation *OperationWithInfo) error {
-	if report.Operations == nil {
-		report.Operations = map[string]*Operation{}
-	}
-
-	_, exists := report.Operations[operation.ID]
-	if exists {
-		return fmt.Errorf("operation with id %q already exists in report", operation.ID)
-	}
-
-	report.Size++
-	report.Operations[operation.ID] = &operation.Operation
-	report.OperationInfos = append(report.OperationInfos, &operation.OperationInfo)
-
-	return nil
-
 }

@@ -2,6 +2,7 @@ package gqlhive
 
 import (
 	"context"
+	"time"
 
 	"github.com/domonda/go-types/nullable"
 	"github.com/domonda/go-types/uu"
@@ -24,6 +25,14 @@ type GenerateID func(operation string, operationName nullable.TrimmedString) str
 func WithGenerateID(fn GenerateID) TracerOption {
 	return tracerOptionFn(func(tracer *Tracer) {
 		tracer.generateID = fn
+	})
+}
+
+var defaultSendReportTimeout time.Duration = 3 * time.Second
+
+func WithSendReportTimeout(timeout time.Duration) TracerOption {
+	return tracerOptionFn(func(tracer *Tracer) {
+		tracer.sendReportTimeout = timeout
 	})
 }
 
