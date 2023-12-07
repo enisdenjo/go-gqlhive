@@ -168,7 +168,7 @@ func TestSendingQueuedReports(t *testing.T) {
 	snaps.MatchJSON(t, sentReport)
 }
 
-func TestSendingQueuedReportsOverHTTP(t *testing.T) {
+func TestSendingReportsOverHTTP(t *testing.T) {
 	token := "sometoken123"
 	tserver := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(http.StatusOK)
