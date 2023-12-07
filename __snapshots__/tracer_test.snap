@@ -495,3 +495,35 @@
  "size": 4
 }
 ---
+
+[TestSendingQueuedReportsOverHTTP - 1]
+{
+ "map": {
+  "id": {
+   "fields": [
+    "Query.todos",
+    "Todo.id"
+   ],
+   "operation": "{ todos { id } }"
+  }
+ },
+ "operations": [
+  {
+   "execution": {
+    "duration": -1,
+    "errorsTotal": 0,
+    "ok": true
+   },
+   "metadata": {
+    "client": {
+     "name": "go-gqlhive",
+     "version": "1.0.1"
+    }
+   },
+   "operationMapKey": "id",
+   "timestamp": -1
+  }
+ ],
+ "size": 1
+}
+---

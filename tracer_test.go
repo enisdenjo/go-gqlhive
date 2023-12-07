@@ -2,6 +2,10 @@ package gqlhive
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"sync"
 	"testing"
@@ -12,6 +16,7 @@ import (
 	"github.com/domonda/go-types/nullable"
 	"github.com/enisdenjo/go-gqlhive/internal/fixtures/todos/graph"
 	"github.com/gkampitakis/go-snaps/snaps"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMain(t *testing.M) {
@@ -161,4 +166,41 @@ func TestSendingQueuedReports(t *testing.T) {
 	wg.Wait()
 
 	snaps.MatchJSON(t, sentReport)
+}
+
+func TestSendingQueuedReportsOverHTTP(t *testing.T) {
+	token := "sometoken123"
+	tserver := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		res.WriteHeader(http.StatusOK)
+
+		require.Equal(t, "POST", req.Method)
+		require.Equal(t, "application/json", req.Header.Get("Content-Type"))
+		require.Equal(t, fmt.Sprintf("Bearer %s", token), req.Header.Get("Authorization"))
+
+		report := &Report{}
+		err := json.NewDecoder(req.Body).Decode(&report)
+		require.NoError(t, err)
+
+		for _, info := range report.OperationInfos {
+			info.Timestamp = -1
+			info.Execution.Duration = -1
+		}
+
+		snaps.MatchJSON(t, report)
+	}))
+	defer tserver.Close()
+
+	server := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+
+	server.Use(NewTracer(
+		token,
+		WithEndpoint(tserver.URL),
+		WithGenerateID(func(operation string, operationName nullable.TrimmedString) string {
+			return "id"
+		}),
+		WithSendReportTimeout(0),
+	))
+
+	res := map[string]any{}
+	client.New(server).MustPost("{ todos { id } }", &res)
 }

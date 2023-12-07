@@ -54,11 +54,12 @@ func defaultSendReport(ctx context.Context, endpoint, token string, report *Repo
 		return err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "PORT", endpoint, &buf)
+	req, err := http.NewRequestWithContext(ctx, "POST", endpoint, &buf)
 	if err != nil {
 		return err
 	}
 	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
