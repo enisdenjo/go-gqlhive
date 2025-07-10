@@ -121,9 +121,9 @@ After acquiring the new access token, provide it alongside the target when setti
 
 ```diff
 gqlhive.NewTracer(
-- "<REGISTRY_TOKEN>",
-+ "<TARGET_ID> or <ORGANIZATION>/<PROJECT>/<TARGET>",
-+ "<ACCESS_TOKEN>",
-  ...opts,
+-	"<REGISTRY_TOKEN>",
++	"<TARGET_ID> or <ORGANIZATION>/<PROJECT>/<TARGET>",
++	"<ACCESS_TOKEN>",
+	...opts,
 )
 ```
