@@ -12,7 +12,7 @@ go get github.com/enisdenjo/go-gqlhive@v1
 
 ### Set up usage reporting in Hive Console
 
-First you have to set up [usage reporting and monitoring Hive Console](https://the-guild.dev/graphql/hive/docs/schema-registry/usage-reporting) and acquire your `target` and access `token`.
+First you have to set up [usage reporting and monitoring Hive Console](https://the-guild.dev/graphql/hive/docs/schema-registry/usage-reporting), define your target and acquire the access token.
 
 ### Use
 
