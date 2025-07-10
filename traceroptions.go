@@ -47,19 +47,20 @@ func WithSendReportTimeout(timeout time.Duration) TracerOption {
 	})
 }
 
-func defaultSendReport(ctx context.Context, endpoint, token string, report *Report) error {
+func defaultSendReport(ctx context.Context, endpoint, target, token string, report *Report) error {
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(report)
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", endpoint, &buf)
+	req, err := http.NewRequestWithContext(ctx, "POST", endpoint+"/"+target, &buf)
 	if err != nil {
 		return err
 	}
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
+	req.Header.Add("X-Usage-API-Version", "2")
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -74,7 +75,7 @@ func defaultSendReport(ctx context.Context, endpoint, token string, report *Repo
 }
 
 // SendReport performs the actual report sending to GraphQL Hive.
-type SendReport func(ctx context.Context, endpoint, token string, report *Report) error
+type SendReport func(ctx context.Context, endpoint, target, token string, report *Report) error
 
 // WithSendReport sets the report sender to GraphQL Hive.
 func WithSendReport(fn SendReport) TracerOption {

@@ -23,7 +23,7 @@ func main() {
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 	srv.AddTransport(transport.POST{})
 
-	srv.Use(gqlhive.NewTracer(""))
+	srv.Use(gqlhive.NewTracer("org/proj/targ", "token"))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
