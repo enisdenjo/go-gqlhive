@@ -163,6 +163,7 @@ func (tracer Tracer) InterceptResponse(ctx context.Context, next graphql.Respons
 
 				err := doSend(
 					// may time out and get cancelled
+					// TODO: use a context with deadline
 					context.TODO(),
 				)
 				if err != nil {
