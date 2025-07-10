@@ -112,3 +112,18 @@ func main() {
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 ```
+
+## Migrating from v1 to v2
+
+The only breaking change in v2 is the move from registry tokens to access tokens. You can read more about the necessary steps in Hive in the [related migration guide](https://the-guild.dev/graphql/hive/docs/migration-guides/organization-access-tokens).
+
+After acquiring the new access token, provide it alongside the target when setting up the tracer:
+
+```diff
+gqlhive.NewTracer(
+- "<REGISTRY_TOKEN>",
++ "<TARGET_ID> or <ORGANIZATION>/<PROJECT>/<TARGET>",
++ "<ACCESS_TOKEN>",
+  ...opts,
+)
+```
