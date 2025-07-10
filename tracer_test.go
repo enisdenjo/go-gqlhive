@@ -15,6 +15,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/domonda/go-types/nullable"
+	"github.com/domonda/go-types/uu"
 	"github.com/enisdenjo/go-gqlhive/internal/fixtures/todos/graph"
 	"github.com/gkampitakis/go-snaps/snaps"
 	"github.com/stretchr/testify/require"
@@ -113,12 +114,13 @@ func TestCreatedReports(t *testing.T) {
 
 			var sentReport *Report
 			srv.Use(NewTracer(
+				uu.IDv4().String(),
 				"<token>",
 				WithGenerateID(func(operation string, operationName nullable.TrimmedString) string {
 					return "id"
 				}),
 				WithSendReportTimeout(0),
-				WithSendReport(func(ctx context.Context, endpoint, token string, report *Report) error {
+				WithSendReport(func(ctx context.Context, endpoint, target, token string, report *Report) error {
 					for _, info := range report.OperationInfos {
 						info.Timestamp = -1
 						info.Execution.Duration = -1
@@ -144,12 +146,13 @@ func TestSendingQueuedReports(t *testing.T) {
 	wg.Add(1)
 	var sentReport *Report
 	srv.Use(NewTracer(
+		uu.IDv4().String(),
 		"<token>",
 		WithGenerateID(func(operation string, operationName nullable.TrimmedString) string {
 			return operation
 		}),
 		WithSendReportTimeout(1*time.Second),
-		WithSendReport(func(ctx context.Context, endpoint, token string, report *Report) error {
+		WithSendReport(func(ctx context.Context, endpoint, target, token string, report *Report) error {
 			for _, info := range report.OperationInfos {
 				info.Timestamp = -1
 				info.Execution.Duration = -1
@@ -172,13 +175,17 @@ func TestSendingQueuedReports(t *testing.T) {
 }
 
 func TestSendingReportsOverHTTP(t *testing.T) {
+	target := uu.IDv4()
 	token := "sometoken123"
 	tserver := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(http.StatusOK)
 
+		require.Equal(t, "/"+target.String(), req.URL.Path)
+
 		require.Equal(t, "POST", req.Method)
 		require.Equal(t, "application/json", req.Header.Get("Content-Type"))
 		require.Equal(t, fmt.Sprintf("Bearer %s", token), req.Header.Get("Authorization"))
+		require.Equal(t, "2", req.Header.Get("X-Usage-API-Version"))
 
 		report := &Report{}
 		err := json.NewDecoder(req.Body).Decode(&report)
@@ -197,6 +204,7 @@ func TestSendingReportsOverHTTP(t *testing.T) {
 	srv.AddTransport(transport.POST{})
 
 	srv.Use(NewTracer(
+		target.String(),
 		token,
 		WithEndpoint(tserver.URL),
 		WithGenerateID(func(operation string, operationName nullable.TrimmedString) string {

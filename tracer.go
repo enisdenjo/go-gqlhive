@@ -4,16 +4,20 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/domonda/go-types/nullable"
+	"github.com/domonda/go-types/uu"
 	"github.com/vektah/gqlparser/v2/ast"
 )
 
 type Tracer struct {
+	target            string
 	token             string
 	endpoint          string
 	generateID        GenerateID
@@ -27,8 +31,14 @@ var _ interface {
 	graphql.FieldInterceptor
 } = Tracer{}
 
-func NewTracer(token string, opts ...TracerOption) *Tracer {
+// NewTracer creates a new Hive Console tracer with the given [target] and access [token].
+// Read more about it here: https://the-guild.dev/graphql/hive/docs/schema-registry/usage-reporting.
+//
+//   - target: Is the slug as displayed on the Hive Console dashboard (e.g. `the-guild/graphql-hive/production`) or the UUID of the target (e.g. `a0f4c605-6541-4350-8cfe-b31f21a4bf80`). The UUID is more resilient to organization/project/target slug adjustments. You can find it within the target settings or by hovering over the target slug within the Hive dashboard.
+//   - token: Is the access token for the given [target]. Instructions about setting up access tokens can be found in the Hive Console Access Tokens documentation: https://the-guild.dev/graphql/hive/docs/management/access-tokens.
+func NewTracer(target, token string, opts ...TracerOption) *Tracer {
 	tracer := &Tracer{
+		target:            target,
 		token:             token,
 		endpoint:          defaultEndpoint,
 		generateID:        defaultGenerateID,
@@ -98,7 +108,7 @@ func (tracer Tracer) InterceptResponse(ctx context.Context, next graphql.Respons
 			queuedReportMtx.Lock()
 			defer queuedReportMtx.Unlock()
 
-			err := tracer.sendReport(ctx, tracer.endpoint, tracer.token, queuedReport)
+			err := tracer.sendReport(ctx, tracer.endpoint, tracer.target, tracer.token, queuedReport)
 			if err != nil {
 				return err
 			}
