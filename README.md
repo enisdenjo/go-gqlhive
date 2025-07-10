@@ -102,6 +102,10 @@ func main() {
 			// custom report sender for queued reports
 			return nil
 		}),
+		gqlhive.WithLogger(
+			// custom logger for tracing errors (this is the default one)
+			log.New(log.Writer(), "[gqlhive] ", log.LstdFlags|log.Lmsgprefix),
+		)
 	))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
