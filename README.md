@@ -43,7 +43,6 @@ func main() {
 	srv := handler.New(NewExecutableSchema(graph.Config{Resolvers: &resolvers{}}))
 	srv.AddTransport(transport.POST{})
 
-	// 👇 use the gqlhive tracer with your token
 	srv.Use(gqlhive.NewTracer(
 		"<TARGET_ID> or <ORGANIZATION>/<PROJECT>/<TARGET>",
 		"<ACCESS_TOKEN>",
