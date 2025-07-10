@@ -56,7 +56,29 @@ func (tracer Tracer) ExtensionName() string {
 }
 
 func (tracer Tracer) Validate(schema graphql.ExecutableSchema) error {
-	// nothing to validate
+	invalidTargetErr := fmt.Errorf("invalid gqlhive tracer target %q, must be a valid pathname <ORGANIZATION>/<PROJECT>/<TARGET> or an UUID <TARGET_ID>", tracer.target)
+
+	u, _ := url.Parse(tracer.target)
+	if u.String() != tracer.target {
+		// valid target wont change once url parsed
+		return invalidTargetErr
+	}
+
+	if strings.Count(tracer.target, "/") != 0 {
+		// probably a pathname
+		if strings.HasPrefix(tracer.target, "/") {
+			return fmt.Errorf("invalid gqlhive tracer target pathname %q, must not start with a slash", tracer.target)
+		}
+		if strings.Count(tracer.target, "/") != 3 {
+			return fmt.Errorf("invalid gqlhive tracer target pathname %q, must contain 3 parts <ORGANIZATION>/<PROJECT>/<TARGET>", tracer.target)
+		}
+	} else {
+		// probably an uuid
+		if u := uu.IDFromStringOrNil(tracer.target); u.IsNil() {
+			return invalidTargetErr
+		}
+	}
+
 	return nil
 }
 
