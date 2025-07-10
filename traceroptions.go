@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -68,7 +69,14 @@ func defaultSendReport(ctx context.Context, endpoint, target, token string, repo
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("report sending failed with %d %s", res.StatusCode, res.Status)
+		defer res.Body.Close()
+		body, _ := io.ReadAll(res.Body)
+		bodyStr := string(body)
+		if bodyStr == "" {
+			return fmt.Errorf("report sending failed with %s (no body)", res.Status)
+		} else {
+			return fmt.Errorf("report sending failed with %s: %s", res.Status, bodyStr)
+		}
 	}
 
 	return nil
@@ -83,6 +91,17 @@ func WithSendReport(fn SendReport) TracerOption {
 		tracer.sendReport = fn
 	})
 }
+
+// WithLogger sets the logger to be used by the tracer.
+// The logger is used for reporting errors during tracing. If set to nil, logging is disabled.
+// You can use the standard Go logger or provide a custom implementation (e.g., logrus, zap).
+func WithLogger(logger Logger) TracerOption {
+	return tracerOptionFn(func(tracer *Tracer) {
+		tracer.log = logger
+	})
+}
+
+var defaultLogger = NewLogger()
 
 type TracerOption interface {
 	set(*Tracer)

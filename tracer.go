@@ -23,6 +23,7 @@ type Tracer struct {
 	generateID        GenerateID
 	sendReportTimeout time.Duration
 	sendReport        SendReport
+	log               Logger
 }
 
 var _ interface {
@@ -44,6 +45,7 @@ func NewTracer(target, token string, opts ...TracerOption) *Tracer {
 		generateID:        defaultGenerateID,
 		sendReportTimeout: defaultSendReportTimeout,
 		sendReport:        defaultSendReport,
+		log:               defaultLogger,
 	}
 	for _, opt := range opts {
 		opt.set(tracer)
@@ -124,8 +126,8 @@ func (tracer Tracer) InterceptResponse(ctx context.Context, next graphql.Respons
 
 		err := queueOperation(operation)
 		if err != nil {
-			// TODO: report gracefully
-			panic(err)
+			tracer.log.Printf("failed to queue operation %q: %v", operation.ID, err)
+			return
 		}
 
 		// TODO: implement send retry
@@ -148,8 +150,7 @@ func (tracer Tracer) InterceptResponse(ctx context.Context, next graphql.Respons
 		if tracer.sendReportTimeout == 0 {
 			err := doSend(ctx)
 			if err != nil {
-				// TODO: report gracefully
-				panic(err)
+				tracer.log.Printf("failed to send report for operation %q: %v", operation.ID, err)
 			}
 			return
 		}
@@ -165,8 +166,7 @@ func (tracer Tracer) InterceptResponse(ctx context.Context, next graphql.Respons
 					context.TODO(),
 				)
 				if err != nil {
-					// TODO: report gracefully
-					panic(err)
+					tracer.log.Printf("failed to send queued report for operation %q: %v", operation.ID, err)
 				}
 			}()
 		}

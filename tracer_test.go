@@ -298,3 +298,80 @@ func TestSendingReportsOverHTTP(t *testing.T) {
 	res := map[string]any{}
 	client.New(srv).MustPost("{ todos { id } }", &res)
 }
+
+//
+
+type testLogger struct {
+	logs []string
+}
+
+func newTestLogger() *testLogger {
+	return &testLogger{}
+}
+
+func (l *testLogger) Printf(format string, v ...any) {
+	l.logs = append(l.logs, fmt.Sprintf(format, v...))
+}
+
+func TestSendReportError(t *testing.T) {
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	srv.AddTransport(transport.POST{})
+
+	testLogger := newTestLogger()
+
+	srv.Use(NewTracer(
+		uu.IDv4().String(),
+		"<token>",
+		WithGenerateID(func(operation string, operationName nullable.TrimmedString) string {
+			return "id"
+		}),
+		WithSendReportTimeout(0),
+		WithSendReport(func(ctx context.Context, endpoint, target, token string, report *Report) error {
+			return fmt.Errorf("test fail send report")
+		}),
+		WithLogger(testLogger),
+	))
+
+	res := map[string]any{}
+	client.New(srv).MustPost("{ todos { id } }", &res)
+
+	snaps.MatchSnapshot(t, testLogger.logs)
+}
+
+func TestSendReportServerError(t *testing.T) {
+	var attempt = 0
+	tserver := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		if attempt == 0 {
+			// with body
+			res.WriteHeader(http.StatusBadRequest)
+			res.Write([]byte("test server error"))
+			attempt++
+		} else {
+			// without body
+			res.WriteHeader(http.StatusInternalServerError)
+		}
+	}))
+	defer tserver.Close()
+
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	srv.AddTransport(transport.POST{})
+
+	testLogger := newTestLogger()
+
+	srv.Use(NewTracer(
+		uu.IDv4().String(),
+		"<token>",
+		WithEndpoint(tserver.URL),
+		WithGenerateID(func(operation string, operationName nullable.TrimmedString) string {
+			return fmt.Sprintf("a%d", attempt)
+		}),
+		WithSendReportTimeout(0),
+		WithLogger(testLogger),
+	))
+
+	res := map[string]any{}
+	client.New(srv).MustPost("query a1 { todos { id } }", &res)
+	client.New(srv).MustPost("query a2 { todos { id } }", &res)
+
+	snaps.MatchSnapshot(t, testLogger.logs)
+}

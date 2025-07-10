@@ -527,3 +527,11 @@
  "size": 1
 }
 ---
+
+[TestSendReportError - 1]
+[]string{"failed to send report for operation \"id\": test fail send report"}
+---
+
+[TestSendReportServerError - 1]
+[]string{"failed to send report for operation \"a0\": report sending failed with 400 Bad Request: test server error", "failed to send report for operation \"a1\": report sending failed with 500 Internal Server Error (no body)"}
+---
