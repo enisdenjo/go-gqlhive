@@ -13,6 +13,7 @@ import (
 
 	"github.com/99designs/gqlgen/client"
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/domonda/go-types/nullable"
 	"github.com/enisdenjo/go-gqlhive/internal/fixtures/todos/graph"
 	"github.com/gkampitakis/go-snaps/snaps"
@@ -107,10 +108,11 @@ func TestCreatedReports(t *testing.T) {
 
 	for _, query := range queries {
 		t.Run(query, func(t *testing.T) {
-			server := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+			srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+			srv.AddTransport(transport.POST{})
 
 			var sentReport *Report
-			server.Use(NewTracer(
+			srv.Use(NewTracer(
 				"<token>",
 				WithGenerateID(func(operation string, operationName nullable.TrimmedString) string {
 					return "id"
@@ -127,7 +129,7 @@ func TestCreatedReports(t *testing.T) {
 			))
 
 			res := map[string]any{}
-			client.New(server).MustPost(query, &res)
+			client.New(srv).MustPost(query, &res)
 
 			snaps.MatchJSON(t, sentReport)
 		})
@@ -135,12 +137,13 @@ func TestCreatedReports(t *testing.T) {
 }
 
 func TestSendingQueuedReports(t *testing.T) {
-	server := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	srv.AddTransport(transport.POST{})
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 	var sentReport *Report
-	server.Use(NewTracer(
+	srv.Use(NewTracer(
 		"<token>",
 		WithGenerateID(func(operation string, operationName nullable.TrimmedString) string {
 			return operation
@@ -158,10 +161,10 @@ func TestSendingQueuedReports(t *testing.T) {
 	))
 
 	res := map[string]any{}
-	client.New(server).MustPost("{ todos { id } } #1", &res)
-	client.New(server).MustPost("{ todos { id } } #2", &res)
-	client.New(server).MustPost("{ todos { id } } #3", &res)
-	client.New(server).MustPost("{ todos { id } } #4", &res)
+	client.New(srv).MustPost("{ todos { id } } #1", &res)
+	client.New(srv).MustPost("{ todos { id } } #2", &res)
+	client.New(srv).MustPost("{ todos { id } } #3", &res)
+	client.New(srv).MustPost("{ todos { id } } #4", &res)
 
 	wg.Wait()
 
@@ -190,9 +193,10 @@ func TestSendingReportsOverHTTP(t *testing.T) {
 	}))
 	defer tserver.Close()
 
-	server := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	srv.AddTransport(transport.POST{})
 
-	server.Use(NewTracer(
+	srv.Use(NewTracer(
 		token,
 		WithEndpoint(tserver.URL),
 		WithGenerateID(func(operation string, operationName nullable.TrimmedString) string {
@@ -202,5 +206,5 @@ func TestSendingReportsOverHTTP(t *testing.T) {
 	))
 
 	res := map[string]any{}
-	client.New(server).MustPost("{ todos { id } }", &res)
+	client.New(srv).MustPost("{ todos { id } }", &res)
 }
