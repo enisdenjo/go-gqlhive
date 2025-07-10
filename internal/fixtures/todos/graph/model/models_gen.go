@@ -3,14 +3,21 @@
 package model
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"strconv"
 )
 
+type Mutation struct {
+}
+
 type NewTodo struct {
 	Text   string `json:"text"`
 	UserID string `json:"userId"`
+}
+
+type Query struct {
 }
 
 type Todo struct {
@@ -61,7 +68,7 @@ func (e TodosConditionStatus) String() string {
 	return string(e)
 }
 
-func (e *TodosConditionStatus) UnmarshalGQL(v interface{}) error {
+func (e *TodosConditionStatus) UnmarshalGQL(v any) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
@@ -76,6 +83,20 @@ func (e *TodosConditionStatus) UnmarshalGQL(v interface{}) error {
 
 func (e TodosConditionStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *TodosConditionStatus) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e TodosConditionStatus) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
 }
 
 type TodosConditionUserStatus string
@@ -102,7 +123,7 @@ func (e TodosConditionUserStatus) String() string {
 	return string(e)
 }
 
-func (e *TodosConditionUserStatus) UnmarshalGQL(v interface{}) error {
+func (e *TodosConditionUserStatus) UnmarshalGQL(v any) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
@@ -117,6 +138,20 @@ func (e *TodosConditionUserStatus) UnmarshalGQL(v interface{}) error {
 
 func (e TodosConditionUserStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *TodosConditionUserStatus) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e TodosConditionUserStatus) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
 }
 
 type TodosSortBy string
@@ -143,7 +178,7 @@ func (e TodosSortBy) String() string {
 	return string(e)
 }
 
-func (e *TodosSortBy) UnmarshalGQL(v interface{}) error {
+func (e *TodosSortBy) UnmarshalGQL(v any) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
@@ -158,4 +193,18 @@ func (e *TodosSortBy) UnmarshalGQL(v interface{}) error {
 
 func (e TodosSortBy) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *TodosSortBy) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e TodosSortBy) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
 }
