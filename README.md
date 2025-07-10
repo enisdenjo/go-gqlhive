@@ -10,9 +10,13 @@ Usage reporting to GraphQL Hive for [gqlgen](https://gqlgen.com/).
 go get github.com/enisdenjo/go-gqlhive@v1
 ```
 
+### Set up usage reporting in Hive Console
+
+First you have to set up [usage reporting and monitoring Hive Console](https://the-guild.dev/graphql/hive/docs/schema-registry/usage-reporting) and acquire your `target` and access `token`.
+
 ### Use
 
-After [getting started with gqlgen](https://gqlgen.com/getting-started/) add the tracer to the server.
+Then, after [getting started with gqlgen](https://gqlgen.com/getting-started/), add the tracer to the server.
 
 ```go
 package main
@@ -40,7 +44,10 @@ func main() {
 	srv.AddTransport(transport.POST{})
 
 	// 👇 use the gqlhive tracer with your token
-	srv.Use(gqlhive.NewTracer("<your-graphql-hive-token>"))
+	srv.Use(gqlhive.NewTracer(
+		"<TARGET_ID> or <ORGANIZATION>/<PROJECT>/<TARGET>",
+		"<ACCESS_TOKEN>",
+	))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
@@ -84,8 +91,9 @@ func main() {
 	srv := handler.New(NewExecutableSchema(graph.Config{Resolvers: &resolvers{}}))
 	srv.AddTransport(transport.POST{})
 
-	// 👇 use the gqlhive tracer with your token and custom options
-	srv.Use(gqlhive.NewTracer("<your-graphql-hive-token>",
+	srv.Use(gqlhive.NewTracer(
+		"<TARGET_ID> or <ORGANIZATION>/<PROJECT>/<TARGET>",
+		"<ACCESS_TOKEN>",
 		gqlhive.WithEndpoint("http://localhost"),
 		gqlhive.WithGenerateID(func(operation string, operationName nullable.TrimmedString) string {
 			return "<custom unique ID generation for operations>"
