@@ -29,6 +29,88 @@ func TestMain(t *testing.M) {
 
 // TODO: test errored fields
 
+func TestInvalidTarget(t *testing.T) {
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+
+	require.PanicsWithError(t,
+		"invalid gqlhive tracer target \"target\", must be a valid pathname <ORGANIZATION>/<PROJECT>/<TARGET> or an UUID <TARGET_ID>",
+		func() {
+			srv.Use(NewTracer(
+				"target",
+				"",
+			))
+		},
+	)
+
+	require.PanicsWithError(t,
+		"invalid gqlhive tracer target pathname \"target/project\", must contain 3 parts <ORGANIZATION>/<PROJECT>/<TARGET>",
+		func() {
+			srv.Use(NewTracer(
+				"target/project",
+				"",
+			))
+		},
+	)
+
+	require.PanicsWithError(t,
+		"invalid gqlhive tracer target pathname \"target/project/bigman/thing\", must contain 3 parts <ORGANIZATION>/<PROJECT>/<TARGET>",
+		func() {
+			srv.Use(NewTracer(
+				"target/project/bigman/thing",
+				"",
+			))
+		},
+	)
+
+	require.PanicsWithError(t,
+		"invalid gqlhive tracer target pathname \"/target/project\", must not start with a slash",
+		func() {
+			srv.Use(NewTracer(
+				"/target/project",
+				"",
+			))
+		},
+	)
+
+	require.PanicsWithError(t,
+		"invalid gqlhive tracer target \"00000000-0000-0000-0000-000000000000\", must be a valid pathname <ORGANIZATION>/<PROJECT>/<TARGET> or an UUID <TARGET_ID>",
+		func() {
+			srv.Use(NewTracer(
+				uu.IDNil.String(),
+				"",
+			))
+		},
+	)
+
+	require.PanicsWithError(t,
+		"gqlhive tracer token must not be empty",
+		func() {
+			srv.Use(NewTracer(
+				uu.IDv4().String(),
+				"",
+			))
+		},
+	)
+
+	require.NotPanics(t,
+		func() {
+			srv.Use(NewTracer(
+				uu.IDv4().String(),
+				"token",
+			))
+		},
+	)
+
+	require.NotPanics(t,
+		func() {
+			srv.Use(NewTracer(
+				"org/project/target",
+				"token",
+			))
+		},
+	)
+}
+
 func TestCreatedReports(t *testing.T) {
 	var queries = []string{
 		"{ todos { id } }",

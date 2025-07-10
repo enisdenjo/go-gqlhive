@@ -69,7 +69,7 @@ func (tracer Tracer) Validate(schema graphql.ExecutableSchema) error {
 		if strings.HasPrefix(tracer.target, "/") {
 			return fmt.Errorf("invalid gqlhive tracer target pathname %q, must not start with a slash", tracer.target)
 		}
-		if strings.Count(tracer.target, "/") != 3 {
+		if strings.Count(tracer.target, "/") != 2 {
 			return fmt.Errorf("invalid gqlhive tracer target pathname %q, must contain 3 parts <ORGANIZATION>/<PROJECT>/<TARGET>", tracer.target)
 		}
 	} else {
@@ -77,6 +77,10 @@ func (tracer Tracer) Validate(schema graphql.ExecutableSchema) error {
 		if u := uu.IDFromStringOrNil(tracer.target); u.IsNil() {
 			return invalidTargetErr
 		}
+	}
+
+	if nullable.TrimmedStringFrom(tracer.token).IsNull() {
+		return errors.New("gqlhive tracer token must not be empty")
 	}
 
 	return nil
