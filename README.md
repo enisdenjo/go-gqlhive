@@ -22,9 +22,8 @@ import (
 	"net/http"
 	"os"
 
-	"example.com/myrepo/mydata/graph"
-
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/enisdenjo/go-gqlhive"
 )
@@ -37,7 +36,8 @@ func main() {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	srv := handler.New(NewExecutableSchema(graph.Config{Resolvers: &resolvers{}}))
+	srv.AddTransport(transport.POST{})
 
 	// 👇 use the gqlhive tracer with your token
 	srv.Use(gqlhive.NewTracer("<your-graphql-hive-token>"))
@@ -66,9 +66,8 @@ import (
 	"os"
 	"time"
 
-	"example.com/myrepo/mydata/graph"
-
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/domonda/go-types/nullable"
 	"github.com/enisdenjo/go-gqlhive"
@@ -82,7 +81,8 @@ func main() {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	srv := handler.New(NewExecutableSchema(graph.Config{Resolvers: &resolvers{}}))
+	srv.AddTransport(transport.POST{})
 
 	// 👇 use the gqlhive tracer with your token and custom options
 	srv.Use(gqlhive.NewTracer("<your-graphql-hive-token>",
