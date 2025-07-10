@@ -20,7 +20,7 @@
    "metadata": {
     "client": {
      "name": "go-gqlhive",
-     "version": "1.0.4"
+     "version": "2.0.0"
     }
    },
    "operationMapKey": "id",
@@ -57,7 +57,7 @@
    "metadata": {
     "client": {
      "name": "go-gqlhive",
-     "version": "1.0.4"
+     "version": "2.0.0"
     }
    },
    "operationMapKey": "id",
@@ -98,7 +98,7 @@
    "metadata": {
     "client": {
      "name": "go-gqlhive",
-     "version": "1.0.4"
+     "version": "2.0.0"
     }
    },
    "operationMapKey": "id",
@@ -135,7 +135,7 @@
    "metadata": {
     "client": {
      "name": "go-gqlhive",
-     "version": "1.0.4"
+     "version": "2.0.0"
     }
    },
    "operationMapKey": "id",
@@ -172,7 +172,7 @@
    "metadata": {
     "client": {
      "name": "go-gqlhive",
-     "version": "1.0.4"
+     "version": "2.0.0"
     }
    },
    "operationMapKey": "id",
@@ -208,7 +208,7 @@
    "metadata": {
     "client": {
      "name": "go-gqlhive",
-     "version": "1.0.4"
+     "version": "2.0.0"
     }
    },
    "operationMapKey": "id",
@@ -243,7 +243,7 @@
    "metadata": {
     "client": {
      "name": "go-gqlhive",
-     "version": "1.0.4"
+     "version": "2.0.0"
     }
    },
    "operationMapKey": "id",
@@ -279,7 +279,7 @@
    "metadata": {
     "client": {
      "name": "go-gqlhive",
-     "version": "1.0.4"
+     "version": "2.0.0"
     }
    },
    "operationMapKey": "id",
@@ -316,7 +316,7 @@
    "metadata": {
     "client": {
      "name": "go-gqlhive",
-     "version": "1.0.4"
+     "version": "2.0.0"
     }
    },
    "operationMapKey": "id",
@@ -351,7 +351,7 @@
    "metadata": {
     "client": {
      "name": "go-gqlhive",
-     "version": "1.0.4"
+     "version": "2.0.0"
     }
    },
    "operationMapKey": "id",
@@ -387,7 +387,7 @@
    "metadata": {
     "client": {
      "name": "go-gqlhive",
-     "version": "1.0.4"
+     "version": "2.0.0"
     }
    },
    "operationMapKey": "id",
@@ -440,7 +440,7 @@
    "metadata": {
     "client": {
      "name": "go-gqlhive",
-     "version": "1.0.4"
+     "version": "2.0.0"
     }
    },
    "operationMapKey": "{ todos { id } } #1",
@@ -455,7 +455,7 @@
    "metadata": {
     "client": {
      "name": "go-gqlhive",
-     "version": "1.0.4"
+     "version": "2.0.0"
     }
    },
    "operationMapKey": "{ todos { id } } #2",
@@ -470,7 +470,7 @@
    "metadata": {
     "client": {
      "name": "go-gqlhive",
-     "version": "1.0.4"
+     "version": "2.0.0"
     }
    },
    "operationMapKey": "{ todos { id } } #3",
@@ -485,7 +485,7 @@
    "metadata": {
     "client": {
      "name": "go-gqlhive",
-     "version": "1.0.4"
+     "version": "2.0.0"
     }
    },
    "operationMapKey": "{ todos { id } } #4",
@@ -517,7 +517,7 @@
    "metadata": {
     "client": {
      "name": "go-gqlhive",
-     "version": "1.0.4"
+     "version": "2.0.0"
     }
    },
    "operationMapKey": "id",

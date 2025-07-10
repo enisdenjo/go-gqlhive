@@ -8,7 +8,7 @@ import (
 
 const (
 	CLIENT_NAME    = "go-gqlhive"
-	CLIENT_VERSION = "1.0.4"
+	CLIENT_VERSION = "2.0.0"
 )
 
 type Report struct {

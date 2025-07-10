@@ -7,7 +7,7 @@ Usage reporting to GraphQL Hive for [gqlgen](https://gqlgen.com/).
 ### Install
 
 ```sh
-go get github.com/enisdenjo/go-gqlhive@v1
+go get github.com/enisdenjo/go-gqlhive@v2
 ```
 
 ### Set up usage reporting in Hive Console
